@@ -13,13 +13,9 @@ jobs:
           POSTGRES_DB: apex-website-api_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
-        healthcheck:
-          test:
-            - CMD-SHELL
-            - pg_isready
-          interval: 10s
-          timeout: 5s
-          retries: "5"
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+
     env:
       - REDIS_URL: redis://localhost:6379
       - POSTGRES_DB: apex-website-api_test
