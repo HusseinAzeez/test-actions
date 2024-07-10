@@ -1,8 +1,6 @@
 name: Test E2E
-
 on:
   - push
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,22 +15,36 @@ jobs:
           POSTGRES_PASSWORD: password
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
+      mysql:
+        image: mysql:13
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: apex-website-api_test
+          MYSQL_USER: apex-website-api_test
+          MYSQL_PASSWORD: password
+        options: --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=3
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s
+          --health-retries 5
     env:
       REDIS_URL: redis://localhost:6379
       POSTGRES_DB: apex-website-api_test
       POSTGRES_USER: apex-website-api_test
       POSTGRES_PASSWORD: password
-
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-      - name: print message
-        run: echo "Hello, World!"
-      # - name: install dependencies
-      #   run: yarn
-      # - name: Migrate the database
-      #   run: npm run migration:run
-      # - name: Seed the database
-      #   run: npm run db:seed
-      # - name: Run E2E test
-      #   run: npm run test:e2e --runInBand
+      - name: install dependencies
+        run: yarn
+      - name: Migrate the database
+        run: npm run migration:run
+      - name: Seed the database
+        run: npm run db:seed
+      - name: Run E2E test
+        run: npm run test:e2e --runInBand
