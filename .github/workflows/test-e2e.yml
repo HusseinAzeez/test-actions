@@ -1,0 +1,38 @@
+name: Test E2E
+on:
+  - push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: apex-website-api_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        healthcheck:
+          test:
+            - CMD-SHELL
+            - pg_isready
+          interval: 10s
+          timeout: 5s
+          retries: "5"
+    env:
+      - REDIS_URL: redis://localhost:6379
+      - POSTGRES_DB: apex-website-api_test
+      - POSTGRES_USER: apex-website-api_test
+      - POSTGRES_PASSWORD: password
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: install dependencies
+        run: yarn
+      - name: Migrate the database
+        run: npm run migration:run
+      - name: Seed the database
+        run: npm run db:seed
+      - name: Run E2E test
+        run: npm run test:e2e --runInBand
