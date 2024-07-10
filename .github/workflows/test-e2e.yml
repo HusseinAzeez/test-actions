@@ -1,6 +1,8 @@
 name: Test E2E
+
 on:
   - push
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,12 +17,12 @@ jobs:
           POSTGRES_PASSWORD: password
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
-
     env:
-      - REDIS_URL: redis://localhost:6379
-      - POSTGRES_DB: apex-website-api_test
-      - POSTGRES_USER: apex-website-api_test
-      - POSTGRES_PASSWORD: password
+      REDIS_URL: redis://localhost:6379
+      POSTGRES_DB: apex-website-api_test
+      POSTGRES_USER: apex-website-api_test
+      POSTGRES_PASSWORD: password
+
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
